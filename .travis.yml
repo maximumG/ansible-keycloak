@@ -1,0 +1,20 @@
+---
+sudo: required
+language: python
+python:
+  - "3.7"
+
+services:
+  - docker
+
+before_install:
+  - sudo apt-get -qq update
+
+install:
+  # Install molecule and docker plugin
+  - pip install molecule docker
+
+script:
+  - molecule --version
+  - ansible --version
+  - molecule test --all
