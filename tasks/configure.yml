@@ -29,9 +29,9 @@
   notify:
     - Restart Keycloak
 
-- name: SHELL | Create Keycloak admin user for Master realm
-  shell: "{{ keycloak_home_directory }}/bin/add-user-keycloak.sh -r master -u {{ keycloak_admin_user }} -p {{ keycloak_admin_password }}"
-  args:
+- name: COMMAND | Create Keycloak admin user for Master realm
+  command:
+    cmd: "{{ keycloak_home_directory }}/bin/add-user-keycloak.sh -r master -u {{ keycloak_admin_user }} -p {{ keycloak_admin_password }}"
     creates: "{{ keycloak_config_directory }}/keycloak-add-user.json"
   become: yes
 
@@ -53,44 +53,44 @@
 
 - name: COMMAND | RUN wildfly scripts for Reverse Proxy configuration
   command:
-    cmd: "{{ keycloak_home_directory}}/bin/jboss-cli.sh --file=/opt/keycloak/tools/proxy.cli"
+    cmd: "{{ keycloak_home_directory }}/bin/jboss-cli.sh --file=/opt/keycloak/tools/proxy.cli"
   become: yes
   notify:
     - Restart Keycloak
 
 - name: COMMAND | RUN wildfly scripts for Hostname configuration
   command:
-    cmd: "{{ keycloak_home_directory}}/bin/jboss-cli.sh --file=/opt/keycloak/tools/hostname.cli"
+    cmd: "{{ keycloak_home_directory }}/bin/jboss-cli.sh --file=/opt/keycloak/tools/hostname.cli"
   become: yes
   notify:
     - Restart Keycloak
 
 - name: COMMAND | RUN wildfly scripts for Theme configuration
   command:
-    cmd: "{{ keycloak_home_directory}}/bin/jboss-cli.sh --file=/opt/keycloak/tools/theme.cli"
+    cmd: "{{ keycloak_home_directory }}/bin/jboss-cli.sh --file=/opt/keycloak/tools/theme.cli"
   become: yes
   notify:
     - Restart Keycloak
 
 - name: COMMAND | RUN wildfly scripts for Database configuration
   command:
-    cmd: "{{ keycloak_home_directory}}/bin/jboss-cli.sh --file=/opt/keycloak/tools/database-{{ keycloak_database_driver }}.cli"
+    cmd: "{{ keycloak_home_directory }}/bin/jboss-cli.sh --file=/opt/keycloak/tools/database-{{ keycloak_database_driver }}.cli"
   become: yes
   notify:
     - Restart Keycloak
 
 - name: COMMAND | RUN wildfly scripts for Logging configuration
   command:
-    cmd: "{{ keycloak_home_directory}}/bin/jboss-cli.sh --file=/opt/keycloak/tools/logging.cli"
+    cmd: "{{ keycloak_home_directory }}/bin/jboss-cli.sh --file=/opt/keycloak/tools/logging.cli"
   become: yes
   notify:
     - Restart Keycloak
 
 - name: COMMAND | RUN wildfly scripts for truststore configuration
   command:
-    cmd: "{{ keycloak_home_directory}}/bin/jboss-cli.sh --file=/opt/keycloak/tools/x509-truststore.cli"
+    cmd: "{{ keycloak_home_directory }}/bin/jboss-cli.sh --file=/opt/keycloak/tools/x509-truststore.cli"
   become: yes
-  when: "{{ ca_files.results|length > 0 }}"
+  when: ca_files.results|length > 0
   notify:
     - Restart Keycloak
 

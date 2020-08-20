@@ -2,6 +2,6 @@
 - name: Converge
   hosts: all
   tasks:
-    - name: "Include keycloak-ng"
+    - name: "Include ansible-keycloak"
       include_role:
-        name: "keycloak-ng"
+        name: "ansible-keycloak"

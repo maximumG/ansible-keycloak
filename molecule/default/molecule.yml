@@ -25,7 +25,6 @@ verifier:
 lint: |
   set -e
   yamllint .
-  ansible-lint
   flake8 --max-line-length=120
 scenario:
   name: default
