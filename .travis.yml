@@ -12,9 +12,10 @@ before_install:
 
 install:
   # Install molecule and docker plugin
-  - pip install molecule docker
+  - pip install molecule docker ansible-lint flake8
 
 script:
-  - molecule --version
-  - ansible --version
-  - molecule test --all
+  - molecule test --scenario-name default
+  - molecule test --scenario-name standalone-ha
+  - molecule test --scenario-name mariadb
+  - molecule test --scenario-name mysql
