@@ -1,0 +1,18 @@
+embed-server --server-config={{ keycloak_config_file }} --std-out=discard
+
+if (outcome != success) of /subsystem=keycloak-server/spi=truststore:read-resource
+    /subsystem=keycloak-server/spi=truststore/:add
+end-if
+
+if (outcome == success) of /subsystem=keycloak-server/spi=truststore/provider=file/:read-resource
+    /subsystem=keycloak-server/spi=truststore/provider=file/:remove
+end-if
+
+{% if ca_files.results|length > 0 %}
+/subsystem=keycloak-server/spi=truststore/provider=file/:add(enabled=true,properties={ \
+    file => {{ keycloak_common_directory }}/keycloak.truststore, \
+    password => {{ keycloak_truststore_passphrase }}, \
+    hostname-verification-policy => "WILDCARD", \
+    disabled => "false"})
+{% endif %}
+stop-embedded-server

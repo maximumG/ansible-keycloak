@@ -1,0 +1,9 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include keycloak-ng"
+      include_role:
+        name: "keycloak-ng"
+      vars:
+        keycloak_config_file: "standalone-ha.xml"

@@ -1,0 +1,17 @@
+---
+
+- name: FILE | Create directories for MariaDB Connector
+  file:
+    path: "{{ keycloak_home_directory }}/modules/system/layers/base/org/mariadb/jdbc/main"
+    state: directory
+    recurse: yes
+
+- name: GET_URL | Download MariaDB Connector
+  get_url:
+    url: "https://repo1.maven.org/maven2/org/mariadb/jdbc/mariadb-java-client/{{ keycloak_mariadb_version }}/mariadb-java-client-{{ keycloak_mariadb_version }}.jar"
+    dest: "{{ keycloak_home_directory }}/modules/system/layers/base/org/mariadb/jdbc/main/mariadb-jdbc.jar"
+
+- name: COPY | Copy MariaDB module.xml
+  copy:
+    src: mariadb-module.xml
+    dest: "{{ keycloak_home_directory }}/modules/system/layers/base/org/mariadb/jdbc/main/module.xml"

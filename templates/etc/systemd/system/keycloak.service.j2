@@ -1,0 +1,15 @@
+[Unit]
+Description=Keycloak Server
+After=network.target
+
+[Service]
+Type=idle
+Environment=JAVA_OPTS={{ keycloak_java_opts }}
+User={{ keycloak_service_user }}
+Group={{ keycloak_service_group }}
+ExecStart={{ keycloak_home_directory }}/bin/standalone.sh --server-config={{ keycloak_config_file }} -Djboss.bind.address={{ keycloak_bind_address }} -Djboss.bind.address.private={{ keycloak_bind_private_address }} -Djboss.http.port={{ keycloak_http_port }} -Djboss.https.port={{ keycloak_https_port }}
+TimeoutStartSec=600
+TimeoutStopSec=600
+
+[Install]
+WantedBy=multi-user.target

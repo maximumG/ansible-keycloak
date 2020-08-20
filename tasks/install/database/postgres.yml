@@ -1,0 +1,17 @@
+---
+
+- name: FILE | Create directories for Postgres Connector
+  file:
+    path: "{{ keycloak_home_directory }}/modules/system/layers/base/org/postgresql/jdbc/main"
+    state: directory
+    recurse: yes
+
+- name: GET_URL | Download Postgres Connector
+  get_url:
+    url: "https://repo1.maven.org/maven2/org/postgresql/postgresql/{{ keycloak_postgres_version }}/postgresql-{{ keycloak_postgres_version }}.jar"
+    dest: "{{ keycloak_home_directory }}/modules/system/layers/base/org/postgresql/jdbc/main/postgres-jdbc.jar"
+
+- name: COPY | Copy Postgres module.xml
+  copy:
+    src: postgres-module.xml
+    dest: "{{ keycloak_home_directory }}/modules/system/layers/base/org/postgresql/jdbc/main/module.xml"

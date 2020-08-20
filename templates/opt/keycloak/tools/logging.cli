@@ -1,0 +1,8 @@
+embed-server --server-config={{ keycloak_config_file }} --std-out=discard
+
+if (outcome != success) of /subsystem=logging/logger=org.keycloak.events:read-resource
+    /subsystem=logging/logger=org.keycloak.events:add
+end-if
+/subsystem=logging/logger=org.keycloak.events:write-attribute(name="level", value="INFO")
+
+stop-embedded-server

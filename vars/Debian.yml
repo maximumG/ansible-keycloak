@@ -1,0 +1,5 @@
+keycloak_install_dependencies:
+  - openjdk-11-jdk
+  - unzip
+  - tar
+  - gzip

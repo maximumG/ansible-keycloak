@@ -1,0 +1,17 @@
+---
+
+- name: FILE | Create directories for MySQL Connector
+  file:
+    path: "{{ keycloak_home_directory }}/modules/system/layers/base/com/mysql/jdbc/main"
+    state: directory
+    recurse: yes
+
+- name: GET_URL | Download MySQL Connector
+  get_url:
+    url: "https://repo1.maven.org/maven2/mysql/mysql-connector-java/{{ keycloak_mysql_version }}/mysql-connector-java-{{ keycloak_mysql_version }}.jar"
+    dest: "{{ keycloak_home_directory }}/modules/system/layers/base/com/mysql/jdbc/main/mysql-jdbc.jar"
+
+- name: COPY | Copy MySQL module.xml
+  copy:
+    src: mysql-module.xml
+    dest: "{{ keycloak_home_directory }}/modules/system/layers/base/com/mysql/jdbc/main/module.xml"

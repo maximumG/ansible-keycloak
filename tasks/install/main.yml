@@ -1,0 +1,68 @@
+---
+
+- name: PACKAGE | Install Keycloak dependencies
+  package:
+    name: "{{ keycloak_install_dependencies }}"
+    state: present
+
+- name: GROUP | Add Keycloak service group
+  user:
+    name: "{{ keycloak_service_group }}"
+  become: yes
+
+- name: USER | Add Keycloak service user
+  user:
+    name: "{{ keycloak_service_user }}"
+    group: "{{ keycloak_service_group }}"
+    home: "{{ keycloak_destination }}"
+    shell: /sbin/nologin
+    system: yes
+  become: yes
+
+- name: FILE | Create the Keycloak directory structure
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ keycloak_service_user }}"
+    group: "{{ keycloak_service_group }}"
+  loop:
+    - "{{ keycloak_destination }}"
+    - "{{ keycloak_tools_directory }}"
+    - "{{ keycloak_common_directory }}"
+    - "{{ keycloak_common_directory }}/themes"
+
+- name: STAT | Check if Keycloak is already installed
+  stat:
+    path: "{{ keycloak_home_directory }}"
+  register: p
+
+- name: UNARCHIVE | Download and Extract Keycloak sources
+  unarchive:
+    src: "https://downloads.jboss.org/keycloak/{{ keycloak_version }}/keycloak-{{ keycloak_version }}.zip"
+    dest: "{{ keycloak_destination }}"
+    owner: "{{ keycloak_service_user }}"
+    group: "{{ keycloak_service_group }}"
+    remote_src: yes
+  when: not p.stat.exists and not keycloak_force_install | bool
+
+- name: INCLUDE | Install MariaDB Connector
+  import_tasks: 'database/mariadb.yml'
+
+- name: INCLUDE | Install MySQL Connector
+  import_tasks: 'database/mysql.yml'
+
+- name: INCLUDE | Install Postgres Connector
+  import_tasks: 'database/postgres.yml'
+
+- name: INCLUDE | Install MSSQL Connector
+  import_tasks: 'database/mssql.yml'
+
+- name: TEMPLATE | Copy Keycloak systemd Unit File
+  template:
+    src: "{{ item }}"
+    dest: "/{{ item | replace('.j2', '') }}"
+  loop:
+    - 'etc/systemd/system/keycloak.service.j2'
+  notify:
+    - Update systemD
+    - Restart Keycloak

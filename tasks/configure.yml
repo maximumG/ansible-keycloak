@@ -1,0 +1,103 @@
+---
+
+- name: COPY | Copy the Base and Keycloak theme in the common directory
+  copy:
+    src: "{{ keycloak_home_directory }}/themes/{{ item }}"
+    dest: "{{ keycloak_common_directory }}/themes"
+    remote_src: yes
+  loop:
+    - base
+    - keycloak
+    - README.txt
+
+- name: COPY | Copy CA certificates
+  copy:
+    src: "{{ item }}"
+    dest: "{{ keycloak_common_directory }}/{{ item | basename }}"
+  register: ca_files
+  with_fileglob:
+    - "ca-certificates/*"
+
+- name: JAVA_CERT | Create the Java truststore with CA certificates
+  java_cert:
+    cert_path: "{{ item.dest }}"
+    cert_alias: "{{ item.dest.split('/')[-1] }}"
+    keystore_create: yes
+    keystore_pass: "{{ keycloak_truststore_passphrase }}"
+    keystore_path: "{{ keycloak_common_directory }}/keycloak.truststore"
+  loop: "{{ ca_files.results }}"
+  notify:
+    - Restart Keycloak
+
+- name: SHELL | Create Keycloak admin user for Master realm
+  shell: "{{ keycloak_home_directory }}/bin/add-user-keycloak.sh -r master -u {{ keycloak_admin_user }} -p {{ keycloak_admin_password }}"
+  args:
+    creates: "{{ keycloak_config_directory }}/keycloak-add-user.json"
+  become: yes
+
+- name: TEMPLATE | Copy Wildfly CLI scripts
+  template:
+    src: "{{ item }}"
+    dest: "/{{ item | replace('.j2', '') }}"
+  loop:
+    - 'opt/keycloak/tools/database-h2.cli'
+    - 'opt/keycloak/tools/database-mariadb.cli'
+    - 'opt/keycloak/tools/database-mssql.cli'
+    - 'opt/keycloak/tools/database-mysql.cli'
+    - 'opt/keycloak/tools/database-postgres.cli'
+    - 'opt/keycloak/tools/hostname.cli'
+    - 'opt/keycloak/tools/logging.cli'
+    - 'opt/keycloak/tools/proxy.cli'
+    - 'opt/keycloak/tools/theme.cli'
+    - 'opt/keycloak/tools/x509-truststore.cli'
+
+- name: COMMAND | RUN wildfly scripts for Reverse Proxy configuration
+  command:
+    cmd: "{{ keycloak_home_directory}}/bin/jboss-cli.sh --file=/opt/keycloak/tools/proxy.cli"
+  become: yes
+  notify:
+    - Restart Keycloak
+
+- name: COMMAND | RUN wildfly scripts for Hostname configuration
+  command:
+    cmd: "{{ keycloak_home_directory}}/bin/jboss-cli.sh --file=/opt/keycloak/tools/hostname.cli"
+  become: yes
+  notify:
+    - Restart Keycloak
+
+- name: COMMAND | RUN wildfly scripts for Theme configuration
+  command:
+    cmd: "{{ keycloak_home_directory}}/bin/jboss-cli.sh --file=/opt/keycloak/tools/theme.cli"
+  become: yes
+  notify:
+    - Restart Keycloak
+
+- name: COMMAND | RUN wildfly scripts for Database configuration
+  command:
+    cmd: "{{ keycloak_home_directory}}/bin/jboss-cli.sh --file=/opt/keycloak/tools/database-{{ keycloak_database_driver }}.cli"
+  become: yes
+  notify:
+    - Restart Keycloak
+
+- name: COMMAND | RUN wildfly scripts for Logging configuration
+  command:
+    cmd: "{{ keycloak_home_directory}}/bin/jboss-cli.sh --file=/opt/keycloak/tools/logging.cli"
+  become: yes
+  notify:
+    - Restart Keycloak
+
+- name: COMMAND | RUN wildfly scripts for truststore configuration
+  command:
+    cmd: "{{ keycloak_home_directory}}/bin/jboss-cli.sh --file=/opt/keycloak/tools/x509-truststore.cli"
+  become: yes
+  when: "{{ ca_files.results|length > 0 }}"
+  notify:
+    - Restart Keycloak
+
+- name: FILE | Change Keycloak directory owner/group
+  file:
+    state: directory
+    path: "{{ keycloak_destination }}"
+    owner: "{{ keycloak_service_user }}"
+    group: "{{ keycloak_service_group }}"
+    recurse: yes

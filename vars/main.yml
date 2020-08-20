@@ -1,0 +1,12 @@
+keycloak_home_directory: "{{ keycloak_destination }}/keycloak-{{ keycloak_version }}"
+
+keycloak_config_directory: "{{ keycloak_home_directory }}/standalone/configuration"
+
+keycloak_common_directory: "{{ keycloak_destination }}/common"
+
+keycloak_tools_directory: "{{ keycloak_destination }}/tools"
+
+keycloak_mariadb_version: 2.5.4
+keycloak_mysql_version: 8.0.19
+keycloak_mssql_version: 7.4.1.jre11
+keycloak_postgres_version: 42.2.5

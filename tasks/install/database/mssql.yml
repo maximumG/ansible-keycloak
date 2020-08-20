@@ -1,0 +1,17 @@
+---
+
+- name: FILE | Create directories for MSSQL Connector
+  file:
+    path: "{{ keycloak_home_directory }}/modules/system/layers/keycloak/com/microsoft/sqlserver/jdbc/main"
+    state: directory
+    recurse: yes
+
+- name: GET_URL | Download MSSQL Connector
+  get_url:
+    url: "https://repo1.maven.org/maven2/com/microsoft/sqlserver/mssql-jdbc/{{ keycloak_mssql_version }}/mssql-jdbc-{{ keycloak_mssql_version }}.jar"
+    dest: "{{ keycloak_home_directory }}/modules/system/layers/keycloak/com/microsoft/sqlserver/jdbc/main/mssql-jdbc.jar"
+
+- name: COPY | Copy MSSQL module.xml
+  copy:
+    src: mssql-module.xml
+    dest: "{{ keycloak_home_directory }}/modules/system/layers/keycloak/com/microsoft/sqlserver/jdbc/main/module.xml"

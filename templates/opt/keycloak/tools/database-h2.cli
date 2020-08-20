@@ -1,0 +1,14 @@
+embed-server --server-config={{ keycloak_config_file }} --std-out=discard
+
+if (outcome == success) of /subsystem=datasources/data-source=KeycloakDS/:read-resource
+/subsystem=datasources/data-source=KeycloakDS/: remove()
+end-if
+/subsystem=datasources/data-source=KeycloakDS: add(jndi-name=java:jboss/datasources/KeycloakDS,enabled=true,use-java-context=true,use-ccm=true, connection-url="jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE", driver-name=h2)
+/subsystem=datasources/data-source=KeycloakDS: write-attribute(name=user-name, value=sa)
+/subsystem=datasources/data-source=KeycloakDS: write-attribute(name=password, value=sa)
+
+if (outcome != success) of /subsystem=datasources/jdbc-driver=h2:read-resource
+/subsystem=datasources/jdbc-driver=mariadb:add(driver-name=h2, driver-module-name=com.h2database.h2, driver-xa-datasource-class-name=org.h2.jdbcx.JdbcDataSource)
+end-if
+
+stop-embedded-server

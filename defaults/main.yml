@@ -1,0 +1,67 @@
+---
+
+###############
+# Installation
+###############
+
+# Keycloak version to install, check https://www.keycloak.org/downloads
+keycloak_version: 11.0.0
+
+# Force the re-installation of keycloak, even if already installed
+keycloak_force_install: no
+
+# Base directory for the keycloak installation
+# /opt/keycloak/keycloak-<version> holds the keycloak software
+# /opt/keycloak/common holds common files shaed by all keycloak version (themes, truststore, keytab,...)
+# /opt/keycloak/tools holds the JBOSS CLI script to configure keycloak
+keycloak_destination: /opt/keycloak
+
+# Keycloak user/group to run with
+keycloak_service_user: keycloak
+keycloak_service_group: keycloak
+
+# Database driver to be used for keycloak storage https://www.keycloak.org/docs/latest/server_installation/index.html#_database
+# Can be h2, mariadb, postgres, mysql or mssql
+keycloak_database_driver: h2
+
+# Configuration file under standalone/configuration directory to use for the keycloak server
+# Can be either standalone.xml or standalone-ha.xml https://www.keycloak.org/docs/latest/server_installation/index.html#_operating-mode
+keycloak_config_file: "standalone.xml"
+
+###############
+# Configuration
+###############
+
+# IP address where keycloak will be available
+keycloak_bind_address: "{{ ansible_default_ipv4.address }}"
+
+# IP address used for Infinispan/Jgroup sync (only used in standalone-ha mode)
+keycloak_bind_private_address: "{{ keycloak_bind_address }}"
+
+# HTTP port where keycloak is reachable
+keycloak_http_port: 8080
+
+# HTTPS port where keycloak is reachable
+keycloak_https_port: 8443
+
+# User/password for the admin user in the master realm
+keycloak_admin_user: change-me
+keycloak_admin_password: change-me
+
+# Whether or not keycloak is running behind a Reverse Proxy
+keycloak_reverse_proxy: no
+
+# Password used to secure the Java truststore
+keycloak_truststore_passphrase: change-me
+
+# Keycloak database settings
+# Only used when the database is not H2. The database must exist prior of the configuration
+keycloak_database_server: localhost
+keycloak_database_port: 3306
+keycloak_database_name: keycloak
+keycloak_database_username: keycloak
+keycloak_database_password: keycloak
+keycloak_jdbc_parameters: ""
+
+# Configure the JAVA_OPTS used by the Keycloak service
+keycloak_java_opts: "-Xms1024m -Xmx4096m -XX:MaxPermSize=768m"

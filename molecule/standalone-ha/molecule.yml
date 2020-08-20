@@ -1,0 +1,39 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: keycloak-centos8
+    image: geerlingguy/docker-centos8-ansible
+    command: ""
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    pre_build_image: true
+  - name: keycloak-debian10
+    image: geerlingguy/docker-debian10-ansible
+    command: ""
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    pre_build_image: true
+provisioner:
+  name: ansible
+verifier:
+  name: testinfra
+lint: |
+  set -e
+  yamllint .
+  ansible-lint
+  flake8 --max-line-length=120
+scenario:
+  name: standalone-ha
+  test_sequence:
+    - lint
+    - destroy
+    - create
+    - converge
+    # - idempotence
+    - verify
+    - destroy

@@ -1,0 +1,13 @@
+---
+- name: Converge
+  hosts: keycloak*
+  tasks:
+    - name: "Include keycloak-ng"
+      include_role:
+        name: "keycloak-ng"
+      vars:
+        keycloak_database_driver: mariadb
+        keycloak_database_server: mariadb
+        keycloak_database_name: keycloak
+        keycloak_database_username: keycloak
+        keycloak_database_password: keycloak

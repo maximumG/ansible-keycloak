@@ -1,0 +1,6 @@
+embed-server --server-config={{ keycloak_config_file }} --std-out=discard
+
+/subsystem=undertow/server=default-server/http-listener=default: write-attribute(name=proxy-address-forwarding, value={{ keycloak_reverse_proxy | bool }})
+/subsystem=undertow/server=default-server/https-listener=https: write-attribute(name=proxy-address-forwarding, value={{ keycloak_reverse_proxy | bool }})
+
+stop-embedded-server

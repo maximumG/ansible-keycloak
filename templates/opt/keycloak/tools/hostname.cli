@@ -1,0 +1,5 @@
+embed-server --server-config={{ keycloak_config_file }} --std-out=discard
+
+/subsystem=keycloak-server/spi=hostname:write-attribute(name=default-provider, value="{%if  keycloak_reverse_proxy | bool %}request{% else %}default{% endif %}")
+
+stop-embedded-server

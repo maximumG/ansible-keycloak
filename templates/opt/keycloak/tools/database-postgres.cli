@@ -1,0 +1,20 @@
+embed-server --server-config={{ keycloak_config_file }} --std-out=discard
+
+if (outcome == success) of /subsystem=datasources/data-source=KeycloakDS/:read-resource
+/subsystem=datasources/data-source=KeycloakDS: remove()
+end-if
+/subsystem=datasources/data-source=KeycloakDS: add(jndi-name=java:jboss/datasources/KeycloakDS,enabled=true,use-java-context=true,use-ccm=true, connection-url="jdbc:postgresql://{{ keycloak_database_server }}::{{ keycloak_database_port }}/{{ keycloak_database_name }}?{{ keycloak_jdbc_parameters }}", driver-name=postgresql)
+/subsystem=datasources/data-source=KeycloakDS: write-attribute(name=user-name, value={{ keycloak_database_username }})
+/subsystem=datasources/data-source=KeycloakDS: write-attribute(name=password, value={{ keycloak_database_password }})
+/subsystem=datasources/data-source=KeycloakDS: write-attribute(name=check-valid-connection-sql, value="SELECT 1")
+/subsystem=datasources/data-source=KeycloakDS: write-attribute(name=background-validation, value=true)
+/subsystem=datasources/data-source=KeycloakDS: write-attribute(name=background-validation-millis, value=60000)
+/subsystem=datasources/data-source=KeycloakDS: write-attribute(name=flush-strategy, value=IdleConnections)
+
+if (outcome != success) of /subsystem=datasources/jdbc-driver=postgresql:read-resource
+/subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql, driver-module-name=org.postgresql.jdbc, driver-xa-datasource-class-name=org.postgresql.xa.PGXADataSource)
+end-if
+
+/subsystem=keycloak-server/spi=connectionsJpa/provider=default:write-attribute(name=properties.schema,value=${env.DB_SCHEMA:public})
+
+stop-embedded-server
