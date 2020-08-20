@@ -1,6 +1,8 @@
 Keycloak
 ========
 
+[![Build Status](https://travis-ci.com/maximumG/ansible-keycloak.svg?branch=master)](https://travis-ci.com/maximumG/ansible-keycloak)
+
 Role used to install and configure [Keycloak](https://www.keycloak.org/), an Open Source Identity and Access Management product.
 
 By default, the role will:
