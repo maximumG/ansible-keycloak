@@ -15,7 +15,7 @@ before_install:
 
 install:
   # Install molecule and docker plugin
-  - pip -q install molecule docker ansible-lint flake8
+  - pip -q install molecule docker ansible-lint flake8 testinfra
 
 script:
   - molecule test --scenario-name default
