@@ -5,4 +5,11 @@ if (outcome != success) of /subsystem=logging/logger=org.keycloak.events:read-re
 end-if
 /subsystem=logging/logger=org.keycloak.events:write-attribute(name="level", value="INFO")
 
+if (outcome != success) of /subsystem=keycloak-server/spi=eventsListener:read-resource
+    /subsystem=keycloak-server/spi=eventsListener:add(default-provider=jboss-logging)
+    /subsystem=keycloak-server/spi=eventsListener/provider=jboss-logging:add(enabled=true)
+    /subsystem=keycloak-server/spi=eventsListener/provider=jboss-logging:write-attribute(name=properties.success-level,value=info)
+    /subsystem=keycloak-server/spi=eventsListener/provider=jboss-logging:write-attribute(name=properties.error-level,value=warn)
+end-if
+
 stop-embedded-server
