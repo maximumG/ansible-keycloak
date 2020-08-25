@@ -1,0 +1,13 @@
+---
+- name: Converge
+  hosts: keycloak*
+  tasks:
+    - name: "Include ansible-keycloak"
+      include_role:
+        name: "ansible-keycloak"
+      vars:
+        keycloak_database_driver: postgres
+        keycloak_database_server: postgres
+        keycloak_database_name: keycloak
+        keycloak_database_username: keycloak
+        keycloak_database_password: keycloak

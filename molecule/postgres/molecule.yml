@@ -1,0 +1,53 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: postgres
+    image: postgres:12-alpine
+    entrypoint: docker-entrypoint.sh
+    command: postgres
+    pre_build_image: true
+    env:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+    networks:
+      - name: molecule-keycloak
+  - name: keycloak-centos8
+    image: geerlingguy/docker-centos8-ansible
+    command: ""
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    pre_build_image: true
+    networks:
+      - name: molecule-keycloak
+  - name: keycloak-debian10
+    image: geerlingguy/docker-debian10-ansible
+    command: ""
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    pre_build_image: true
+    networks:
+      - name: molecule-keycloak
+provisioner:
+  name: ansible
+verifier:
+  name: testinfra
+lint: |
+  set -e
+  yamllint .
+  flake8 --max-line-length=120
+scenario:
+  name: postgres
+  test_sequence:
+    - lint
+    - destroy
+    - create
+    - converge
+    # - idempotence
+    - verify
+    - destroy
