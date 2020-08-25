@@ -64,7 +64,7 @@ N/A
 Example Playbook
 ----------------
 
-Install and configure Keycloak 10.0.0 as a SystemD service in `/opt/keycloak/` with an `h2` database
+Install and configure Keycloak 11.0.0 as a SystemD service in `/opt/keycloak/` with an `h2` database
 and default admin user on master realm.
 
 ```yaml
